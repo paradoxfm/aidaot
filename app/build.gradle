@@ -44,4 +44,5 @@ dependencies {
 	annotationProcessor "org.projectlombok:lombok:1.16.20"
 
 	implementation 'com.github.florent37:expansionpanel:1.1.2'
+	implementation 'com.github.florent37:singledateandtimepicker:2.1.1'
 }
