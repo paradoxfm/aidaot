@@ -12,7 +12,11 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class LapItem {
 
+	private boolean started;
+
 	private int position;
 
 	private LocalTime time;
+
+	private LocalTime alarmTime;
 }

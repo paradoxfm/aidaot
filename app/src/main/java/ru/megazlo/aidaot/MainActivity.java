@@ -41,17 +41,15 @@ public class MainActivity extends AppCompatActivity {
 	@SystemService
 	protected AlarmManager alarmManager;
 
-	private MediaPlayer player;
+	private List<LapItem> laps = new ArrayList<>();
 
-	private PendingIntent pendingIntent;
+	private MediaPlayer player;
 
 	@AfterViews
 	protected void afterViews() {
 		setSupportActionBar(toolbar);
 		preparePlayer();
 		fabAdd.setEnabled(false);
-
-		pendingIntent = createPendingIntent();
 
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
@@ -122,40 +120,64 @@ public class MainActivity extends AppCompatActivity {
 		list.setAdapter(adapter);
 		for (int i = 0; i < countStarts; i++) {
 			final LocalTime ot = start.plusMinutes(i * intervalStarts);
-			configAlarm(ot.minusMinutes(2));
-			adapter.add(new LapItem().setPosition(i + 1).setTime(ot));
+			final LapItem lap = new LapItem().setPosition(i + 1).setTime(ot).setAlarmTime(ot.minusMinutes(2));
+			laps.add(lap);
+			if (i == 0) {
+				configAlarm(lap.getPosition(), lap.getAlarmTime());
+			}
 		}
+		adapter.addAll(laps);
 		adapter.notifyDataSetChanged();
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		Log.i(TAG, "execute alarm");
+		if (TIME_ACTION.equals(intent.getAction())) {
+			Log.i(TAG, "execute alarm");
+			if (player != null) {
+				//player.seekTo(0);
+				player.start();
+			}
+			configureNextAlarm(intent.getIntExtra("pos", -1));
+		}
 	}
 
-	@Receiver(actions = TIME_ACTION)
-	protected void onAlarm() {
-		Log.i(TAG, "execute alarm ");
-		Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
+	private void configureNextAlarm(int pos) {
+		LapItem nextItm = null;
+		for (LapItem lp : laps) {
+			if (lp.getPosition() == pos) {
+				lp.setStarted(true);
+			}
+			if (lp.getPosition() == pos + 1) {
+				nextItm = lp;
+				break;
+			}
+		}
+		if (nextItm != null) {
+			configAlarm(nextItm.getPosition(), nextItm.getAlarmTime());
+		}
+		final LapsAdapter adapter = (LapsAdapter) list.getAdapter();
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		alarmManager.cancel(pendingIntent);
+		//alarmManager.cancel(pendingIntent);
 	}
 
-	private PendingIntent createPendingIntent() {
-		Intent startIntent = new Intent(this, MainActivityGen.class);
+	private PendingIntent createPendingIntent(int pos) {
+		Intent startIntent = new Intent(this, MainActivityGen.class).putExtra("pos", pos);
 		startIntent.setAction(TIME_ACTION);
 		return PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
-	private void configAlarm(LocalTime time) {
+	private void configAlarm(int pos, LocalTime time) {
 		final DateTime dateTime = time.toDateTimeToday();
 		Log.i(TAG, "date alarm " + dateTime);
 		int ALARM_TYPE = AlarmManager.RTC_WAKEUP;
+		final PendingIntent pendingIntent = createPendingIntent(pos);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			alarmManager.setExactAndAllowWhileIdle(ALARM_TYPE, dateTime.toCalendar(null).getTimeInMillis(), pendingIntent);
 		} else {
