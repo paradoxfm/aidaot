@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 import ru.megazlo.aidaot.component.LapsAdapter;
+import ru.megazlo.aidaot.component.ShowcaseUtil;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
@@ -32,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
 	protected Toolbar toolbar;
 	@ViewById(R.id.fab_add)
 	protected FloatingActionButton fabAdd;
-	@ViewById(R.id.fab_start)
-	protected FloatingActionButton fabStart;
+	/*@ViewById(R.id.fab_start)
+	protected FloatingActionButton fabStart;*/
 	@ViewById(R.id.list_items)
 	protected ListView list;
 	@ViewById(R.id.official_time)
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 	@AfterViews
 	protected void afterViews() {
 		setSupportActionBar(toolbar);
+		//getSupportActionBar().setIcon(R.mipmap.ic_launcher);
 		preparePlayer();
 		fabAdd.setEnabled(false);
 
@@ -60,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
 				});
 			}
 		}, 0, 1000);
+
+		ShowcaseUtil.builder(ShowcaseUtil.MAIN_VIEW, this)
+				.add(R.id.official_time, R.string.help_official_time).add(R.id.fab_add, R.string.help_fab_add)
+				.add(R.id.list_items, R.string.help_list_items)
+				.run();
 	}
 
 	@Background(delay = 1000L)
@@ -95,16 +104,16 @@ public class MainActivity extends AppCompatActivity {
 		startActivityForResult(new Intent(this, SetupActivityGen.class), ACT_CODE);
 	}
 
-	@Click(R.id.fab_start)
+	/*@Click(R.id.fab_start)
 	protected void startCompetition() {
 		Toast.makeText(this, "Осталось совсем немного и заиграет музыка", Toast.LENGTH_SHORT).show();
-	}
+	}*/
 
 	@OnActivityResult(ACT_CODE)
 	protected void onSetupResult(int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
 			fabAdd.hide();
-			fabStart.show();
+			//fabStart.show();
 			final Date timeStart = (Date) data.getSerializableExtra("time_start");
 			final int countStarts = data.getIntExtra("count_starts", 1);
 			final int intervalStarts = data.getIntExtra("interval_starts", 3);

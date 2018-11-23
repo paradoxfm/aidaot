@@ -9,6 +9,8 @@ import com.shawnlin.numberpicker.NumberPicker;
 
 import org.androidannotations.annotations.*;
 
+import ru.megazlo.aidaot.component.ShowcaseUtil;
+
 @EActivity(R.layout.activity_setup)
 public class SetupActivity extends AppCompatActivity {
 
@@ -24,6 +26,11 @@ public class SetupActivity extends AppCompatActivity {
 	@AfterViews
 	protected void afterViews() {
 		setSupportActionBar(toolbar);
+
+		ShowcaseUtil.builder(ShowcaseUtil.SETUP_VIEW, this)
+				.add(R.id.time_start, R.string.help_official_time).add(R.id.count_starts, R.string.help_fab_add)
+				.add(R.id.interval_starts, R.string.help_list_items)
+				.run();
 	}
 
 	@Click(R.id.fab_done)
