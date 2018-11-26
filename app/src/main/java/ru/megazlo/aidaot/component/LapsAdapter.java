@@ -3,8 +3,7 @@ package ru.megazlo.aidaot.component;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.*;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.*;
 
 import ru.megazlo.aidaot.LapItem;
 import ru.megazlo.aidaot.R;
@@ -27,19 +26,25 @@ public class LapsAdapter extends ArrayAdapter<LapItem> {
 			holder = new LapsAdapter.ViewHolder();
 			cView = inflater.inflate(R.layout.table_detail_row, parent, false);
 			holder.order = cView.findViewById(R.id.tv_order);
-			holder.time = cView.findViewById(R.id.tv_time);
+			holder.timeOt = cView.findViewById(R.id.tv_time);
+			holder.timeTm = cView.findViewById(R.id.tv_time_tm);
+			holder.state = cView.findViewById(R.id.table_run_state);
 			cView.setTag(holder);
 		} else {
 			holder = (LapsAdapter.ViewHolder) cView.getTag();
 		}
 		LapItem item = getItem(position);
-		holder.order.setText(Integer.toString(item.getPosition()));
-		holder.time.setText(item.getTime().toString("HH:mm:ss"));
+		holder.order.setText(String.format("%02d", item.getPosition()));
+		holder.timeOt.setText(String.format("OT %s", item.getTime().toString("HH:mm:ss")));
+		holder.timeTm.setText(String.format("2 minutes %s", item.getTime().minusMinutes(2).toString("HH:mm:ss")));
+		holder.state.setVisibility(item.isStarted() ? View.VISIBLE : View.INVISIBLE);
 		return cView;
 	}
 
 	private class ViewHolder {
 		TextView order;
-		TextView time;
+		TextView timeOt;
+		TextView timeTm;
+		ImageView state;
 	}
 }

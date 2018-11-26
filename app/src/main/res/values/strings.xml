@@ -11,4 +11,12 @@
 	<string name="help_fab_add">Button to add a start sequence</string>
 	<string name="help_list_items">List of sequences after tuning</string>
 
+	<string name="help_time_first_ot">Time of the first official top. The first OT must be 2 minutes past the current time</string>
+	<string name="help_count_starts">Count starts</string>
+	<string name="help_interval_starts">Start interval</string>
+
+	<string name="warn_first_ot">The first OT must be 2 minutes past the current time</string>
+	<string name="want_exit">Do you want exit? The timer will stop</string>
+	<string name="ask_cancel_setup">Do you want cancel setup?</string>
+	<string name="cancel">Cancel</string>
 </resources>

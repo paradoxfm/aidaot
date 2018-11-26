@@ -3,24 +3,31 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/main_contain"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	app:layout_behavior="@string/appbar_scrolling_view_behavior"
 	tools:context=".MainActivityGen"
 	tools:showIn="@layout/activity_main">
 
-	<TextView
-		android:id="@+id/official_time"
+	<RelativeLayout
 		android:layout_width="match_parent"
-		android:gravity="center"
-		android:textSize="30sp"
-		android:textColor="@color/colorPrimaryDark"
-		android:textAlignment="center"
-		android:layout_height="60dp"/>
+		android:layout_height="match_parent">
 
-	<ListView
-		android:id="@+id/list_items"
-		app:layout_constraintTop_toBottomOf="@id/official_time"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"/>
+		<TextView
+			android:id="@+id/official_time"
+			android:layout_width="match_parent"
+			android:layout_height="60dp"
+			android:gravity="center"
+			android:textAlignment="center"
+			android:textColor="@color/colorPrimaryDark"
+			android:textSize="30sp"/>
+
+		<ListView
+			android:id="@+id/list_items"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/official_time"/>
+
+	</RelativeLayout>
 </android.support.constraint.ConstraintLayout>

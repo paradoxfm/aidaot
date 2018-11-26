@@ -2,6 +2,8 @@ package ru.megazlo.aidaot;
 
 import org.joda.time.LocalTime;
 
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,7 +12,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class LapItem {
+public class LapItem implements Serializable {
 
 	private boolean started;
 
