@@ -19,4 +19,8 @@
 	<string name="want_exit">Do you want exit? The timer will stop</string>
 	<string name="ask_cancel_setup">Do you want cancel setup?</string>
 	<string name="cancel">Cancel</string>
+	<string name="action_about">About</string>
+	<string name="about_text">Developed by Ivan Gurkin</string>
+	<string name="fb_link">https://fb.com/paradoxfm</string>
+	<string name="mail_link">megazlonet@gmail.com</string>
 </resources>

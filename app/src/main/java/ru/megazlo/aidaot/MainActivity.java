@@ -1,7 +1,6 @@
 package ru.megazlo.aidaot;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.*;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
@@ -12,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,6 +27,7 @@ import ru.megazlo.aidaot.component.ShowcaseUtil;
 import ru.megazlo.aidaot.dto.LapsState;
 
 @EActivity(R.layout.activity_main)
+@OptionsMenu(R.menu.menu_about)
 public class MainActivity extends AppCompatActivity {
 
 	private final static int ACT_CODE = 34564;
@@ -94,6 +95,13 @@ public class MainActivity extends AppCompatActivity {
 			adapter.addAll(state.getLaps());
 			list.setAdapter(adapter);
 		}*/
+	}
+
+	@OptionsItem(R.id.action_login)
+	protected void actionAbout() {
+		View dialogView = getLayoutInflater().inflate(R.layout.alert_about, null);
+		AlertDialog.Builder b = new AlertDialog.Builder(this).setView(dialogView).setPositiveButton(R.string.ok, null);
+		b.show();
 	}
 
 	/*@Override
