@@ -33,6 +33,8 @@ public class SetupActivity extends AppCompatActivity {
 	protected void afterViews() {
 		setSupportActionBar(toolbar);
 
+		timePicker.setStepMinutes(1);
+
 		ShowcaseUtil.builder(ShowcaseUtil.SETUP_VIEW, this)
 				.add(R.id.time_start, R.string.help_time_first_ot).add(R.id.count_starts, R.string.help_count_starts)
 				.add(R.id.interval_starts, R.string.help_interval_starts)
