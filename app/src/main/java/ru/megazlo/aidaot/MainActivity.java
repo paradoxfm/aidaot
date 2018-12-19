@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.*;
 
 import ru.megazlo.aidaot.component.LapsAdapter;
-import ru.megazlo.aidaot.component.ShowcaseUtil;
 import ru.megazlo.aidaot.dto.LapsState;
 
 @EActivity(R.layout.activity_main)
@@ -79,10 +78,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}, 0, 1000);
 
-		ShowcaseUtil.builder(ShowcaseUtil.MAIN_VIEW, this)
-				.add(R.id.official_time, R.string.help_official_time).add(R.id.fab_add, R.string.help_fab_add)
-				.add(R.id.list_items, R.string.help_list_items)
-				.run();
 
 		/*SharedPreferences pref = getPreferences(MODE_PRIVATE);
 		String strState = pref.getString("state", "");
