@@ -1,5 +1,7 @@
 package ru.megazlo.aidaot.dto;
 
+import org.joda.time.LocalTime;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,10 @@ import ru.megazlo.aidaot.LapItem;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LapsState implements Serializable {
+
+	private int lapTime;
+
+	private LocalTime start;
 
 	private List<LapItem> laps = new ArrayList<>();
 }

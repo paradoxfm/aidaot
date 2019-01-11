@@ -23,4 +23,8 @@
 	<string name="about_text">Developed by Ivan Gurkin</string>
 	<string name="fb_link">https://fb.com/paradoxfm</string>
 	<string name="mail_link">megazlonet@gmail.com</string>
+	<string name="press_to_exit">Press again to exit</string>
+	<string name="menu_add_lap">Add</string>
+	<string name="menu_mute">Mute</string>
+	<string name="menu_clear">Clear</string>
 </resources>

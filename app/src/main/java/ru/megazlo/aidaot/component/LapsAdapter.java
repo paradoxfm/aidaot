@@ -2,6 +2,7 @@ package ru.megazlo.aidaot.component;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.*;
 import android.widget.*;
 
@@ -38,6 +39,9 @@ public class LapsAdapter extends ArrayAdapter<LapItem> {
 		holder.timeOt.setText(String.format("OT %s", item.getTime().toString("HH:mm:ss")));
 		holder.timeTm.setText(String.format("2 minutes %s", item.getTime().minusMinutes(2).toString("HH:mm:ss")));
 		holder.state.setVisibility(item.isStarted() ? View.VISIBLE : View.INVISIBLE);
+		if (item.isAfterOt()) {
+			holder.state.setColorFilter(ContextCompat.getColor(getContext(), R.color.color_indicator_started));
+		}
 		return cView;
 	}
 

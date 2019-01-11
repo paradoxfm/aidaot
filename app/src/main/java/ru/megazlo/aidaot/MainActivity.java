@@ -5,15 +5,19 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
+
+import com.android.billingclient.api.BillingClient;
 
 import org.androidannotations.annotations.*;
 import org.joda.time.DateTime;
@@ -27,7 +31,7 @@ import ru.megazlo.aidaot.dto.LapsState;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.menu_about)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
 	private final static int ACT_CODE = 34564;
 	private final static String TIME_ACTION = "ru.megazlo.aidaot.TIME_ACTION";
@@ -49,17 +53,21 @@ public class MainActivity extends AppCompatActivity {
 	protected ConstraintLayout mainContain;
 	@InstanceState
 	protected LapsState state = new LapsState();
+	@ViewById(R.id.bottom_menu)
+	protected BottomNavigationView bottomNavigationView;
+
+	private BillingClient mBillingClient;
 
 	private MediaPlayer player;
 
 	private PendingIntent pendingIntent;
 
-	//private Gson gson;
+	private boolean doubleBackToExitPressedOnce;
 
-	/*@AfterExtras
-	protected void config() {
-		gson = Converters.registerLocalTime(new GsonBuilder()).create();
-	}*/
+	//@AfterInject
+	protected void afterInject() {
+		//mBillingClient = BillingClient.newBuilder(this).setListener(this).build();
+	}
 
 	@AfterViews
 	protected void afterViews() {
@@ -67,29 +75,16 @@ public class MainActivity extends AppCompatActivity {
 		getSupportActionBar().setIcon(R.drawable.ic_logo_app_simple);
 		preparePlayer();
 		fabAdd.setEnabled(false);
-
+		bottomNavigationView.setOnNavigationItemSelectedListener(this);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				runOnUiThread(() -> {
 					LocalTime tm = new LocalTime(new Date().getTime());
-					officialTime.setText(String.format("Official time: %s", tm.toString("HH.mm.ss")));
+					officialTime.setText(String.format("Official time: %s", tm.toString("HH:mm:ss")));
 				});
 			}
 		}, 0, 1000);
-
-
-		/*SharedPreferences pref = getPreferences(MODE_PRIVATE);
-		String strState = pref.getString("state", "");
-		//strState = "";
-		if (strState != null && strState.length() > 0) {
-			state = gson.fromJson(strState, LapsState.class);
-		}
-		if (state.getLaps().size() > 0) {
-			final LapsAdapter adapter = new LapsAdapter(this);
-			adapter.addAll(state.getLaps());
-			list.setAdapter(adapter);
-		}*/
 	}
 
 	@OptionsItem(R.id.action_login)
@@ -99,15 +94,7 @@ public class MainActivity extends AppCompatActivity {
 		b.show();
 	}
 
-	/*@Override
-	protected void onCreate(@Nullable Bundle sis) {
-		super.onCreate(sis);
-		if (TIME_ACTION.equals(getIntent().getAction())) {
-
-		}
-	}*/
-
-	@Background(delay = 1000L)
+	@Background(delay = 500L)
 	protected void preparePlayer() {
 		try {
 			AssetFileDescriptor fd = getAssets().openFd("aida.mp3");
@@ -117,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
 			p.setLooping(false);
 			player = p;
 			enableAdding();
+			player.setOnCompletionListener(mp -> {
+				player.setVolume(1, 1);
+				Toast.makeText(this, "Stop countdown", Toast.LENGTH_SHORT).show();
+			});
+			player.setOnErrorListener((mp, what, extra) -> {
+				Toast.makeText(this, "MediaPlayer error", Toast.LENGTH_LONG).show();
+				return false;
+			});
+			player.setVolume(1, 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -124,13 +120,11 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
-		/*if (state.getLaps().size() > 0) {
-			SharedPreferences pref = getPreferences(MODE_PRIVATE);
-			SharedPreferences.Editor edit = pref.edit();
-			String json = gson.toJson(state);
-			edit.putString("state", json).commit();
-		}*/
 		super.onDestroy();
+		stopAndRelease();
+	}
+
+	private void stopAndRelease() {
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 		}
@@ -149,14 +143,10 @@ public class MainActivity extends AppCompatActivity {
 		startActivityForResult(new Intent(this, SetupActivityGen.class), ACT_CODE);
 	}
 
-	/*@Click(R.id.fab_start)
-	protected void startCompetition() {
-		Toast.makeText(this, "Осталось совсем немного и заиграет музыка", Toast.LENGTH_SHORT).show();
-	}*/
-
 	@OnActivityResult(ACT_CODE)
 	protected void onSetupResult(int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
+			bottomNavigationView.setVisibility(View.VISIBLE);
 			fabAdd.hide();
 			//fabStart.show();
 			final Date timeStart = (Date) data.getSerializableExtra("time_start");
@@ -170,20 +160,32 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
+		if (doubleBackToExitPressedOnce) {
+			super.onBackPressed();
+			return;
+		}
+		this.doubleBackToExitPressedOnce = true;
+		Toast.makeText(this, getString(R.string.press_to_exit), Toast.LENGTH_SHORT).show();
+		new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+	}
+
+	/*@Override
+	public void onBackPressed() {
 		if (state.getLaps().size() > 0) {
 			Snackbar.make(mainContain, R.string.want_exit, Snackbar.LENGTH_LONG).setAction(R.string.ok, view -> super.onBackPressed()).show();
 		} else {
 			super.onBackPressed();
 		}
-	}
+	}*/
 
 	private void setupTimers(Date timeStart, int countStarts, int intervalStarts) {
-		LocalTime start = new LocalTime(timeStart.getTime()).withSecondOfMinute(0).withMillisOfSecond(0);
+		state.setStart(new LocalTime(timeStart.getTime()).withSecondOfMinute(0).withMillisOfSecond(0));
+		state.setLapTime(intervalStarts);
 		final LapsAdapter adapter = new LapsAdapter(this);
 		list.setAdapter(adapter);
 		state.getLaps().clear();
 		for (int i = 0; i < countStarts; i++) {
-			final LocalTime ot = start.plusMinutes(i * intervalStarts);
+			final LocalTime ot = state.getStart().plusMinutes(i * intervalStarts);
 			final LapItem lap = new LapItem().setPosition(i + 1).setTime(ot).setAlarmTime(ot.minusMinutes(2));
 			state.getLaps().add(lap);
 			if (i == 0) {
@@ -199,12 +201,30 @@ public class MainActivity extends AppCompatActivity {
 		super.onNewIntent(intent);
 		if (TIME_ACTION.equals(intent.getAction())) {
 			Log.i(TAG, "execute alarm");
+			final int pos = intent.getIntExtra("pos", -1);
+			updateAfterOt(pos);
 			if (player != null) {
 				//player.seekTo(0);
 				player.start();
 			}
-			configureNextAlarm(intent.getIntExtra("pos", -1));
+			configureNextAlarm(pos);
 		}
+	}
+
+	@UiThread(delay = 120000)
+	protected void updateAfterOt(int pos) {
+		if (pos != -1) {
+			final int index = pos - 1;
+			Log.i(TAG, "scroll to pos " + index);
+			state.getLaps().get(index).setAfterOt(true);
+			refreshList();
+			//list.smoothScrollToPosition(index < 1 ? 1 : index - 1);
+		}
+	}
+
+	private void refreshList() {
+		final LapsAdapter adapter = (LapsAdapter) list.getAdapter();
+		adapter.notifyDataSetChanged();
 	}
 
 	private void configureNextAlarm(int pos) {
@@ -221,14 +241,7 @@ public class MainActivity extends AppCompatActivity {
 		if (nextItm != null) {
 			configAlarm(nextItm.getPosition(), nextItm.getAlarmTime());
 		}
-		final LapsAdapter adapter = (LapsAdapter) list.getAdapter();
-		adapter.notifyDataSetChanged();
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		//alarmManager.cancel(pendingIntent);
+		refreshList();
 	}
 
 	private PendingIntent createPendingIntent(int pos) {
@@ -247,5 +260,43 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			alarmManager.setExact(ALARM_TYPE, dateTime.toCalendar(null).getTimeInMillis(), pendingIntent);
 		}
+	}
+
+	private void actionAddItem() {
+		LocalTime ot = state.getStart().plusMinutes(state.getLaps().size() * state.getLapTime());
+		final LapItem lap = new LapItem().setPosition(state.getLaps().size() + 1).setTime(ot).setAlarmTime(ot.minusMinutes(2));
+		state.getLaps().add(lap);
+		final LapsAdapter adapter = (LapsAdapter) list.getAdapter();
+		adapter.add(lap);
+		adapter.notifyDataSetChanged();
+	}
+
+	private void actionClearAlarms() {
+		stopAndRelease();
+		list.setAdapter(null);
+		bottomNavigationView.setVisibility(View.GONE);
+		fabAdd.show();
+		preparePlayer();
+	}
+
+	private void actionChangeMuteCurrent() {
+		player.setVolume(0, 0);
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(@NonNull MenuItem mi) {
+		switch (mi.getItemId()) {
+			case R.id.action_add:
+				actionAddItem();
+				break;
+			case R.id.action_mute:
+				actionChangeMuteCurrent();
+				break;
+			case R.id.action_clear:
+				actionClearAlarms();
+				break;
+		}
+		Log.i(TAG, "bottom item selected");
+		return false;
 	}
 }

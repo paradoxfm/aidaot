@@ -4,6 +4,7 @@
           package="ru.megazlo.aidaot">
 
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
+	<uses-permission android:name="com.android.vending.BILLING"/>
 
 	<application
 		android:icon="@mipmap/ic_launcher"

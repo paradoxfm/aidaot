@@ -16,6 +16,8 @@ public class LapItem implements Serializable {
 
 	private boolean started;
 
+	private boolean afterOt;
+
 	private int position;
 
 	private LocalTime time;

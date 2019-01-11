@@ -23,11 +23,22 @@
 			android:textColor="@color/colorPrimaryDark"
 			android:textSize="30sp"/>
 
+		<android.support.design.widget.BottomNavigationView
+			android:id="@+id/bottom_menu"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:background="@color/colorPrimary"
+			android:visibility="gone"
+			app:itemIconTint="@color/white"
+			app:itemTextColor="@color/white"
+			app:menu="@menu/menu_bottom"/>
+
 		<ListView
 			android:id="@+id/list_items"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_above="@id/bottom_menu"
 			android:layout_below="@id/official_time"/>
-
 	</RelativeLayout>
 </android.support.constraint.ConstraintLayout>
