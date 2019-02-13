@@ -29,7 +29,7 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentBottom="true"
 			android:background="@color/colorPrimary"
-			android:visibility="gone"
+			app:itemBackground="@drawable/drawer_item"
 			app:itemIconTint="@color/white"
 			app:itemTextColor="@color/white"
 			app:menu="@menu/menu_bottom"/>

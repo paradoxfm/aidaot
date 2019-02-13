@@ -20,8 +20,7 @@ import android.widget.*;
 import com.android.billingclient.api.BillingClient;
 
 import org.androidannotations.annotations.*;
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
+import org.joda.time.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -31,7 +30,7 @@ import ru.megazlo.aidaot.dto.LapsState;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.menu_about)
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemReselectedListener {
 
 	private final static int ACT_CODE = 34564;
 	private final static String TIME_ACTION = "ru.megazlo.aidaot.TIME_ACTION";
@@ -71,11 +70,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 	@AfterViews
 	protected void afterViews() {
+		final LocalDateTime t = new LocalDateTime(2019, 3, 1, 1, 0);
+		final LocalDateTime now = new LocalDateTime();
+		if (now.isAfter(t)) {
+			Toast.makeText(this, "Test period ended", Toast.LENGTH_SHORT).show();
+			this.finish();
+		}
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setIcon(R.drawable.ic_logo_app_simple);
 		preparePlayer();
 		fabAdd.setEnabled(false);
 		bottomNavigationView.setOnNavigationItemSelectedListener(this);
+		bottomNavigationView.setOnNavigationItemReselectedListener(this);
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
@@ -94,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		b.show();
 	}
 
-	@Background(delay = 500L)
+	@Background(delay = 300L)
 	protected void preparePlayer() {
 		try {
 			AssetFileDescriptor fd = getAssets().openFd("aida.mp3");
@@ -104,10 +110,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 			p.setLooping(false);
 			player = p;
 			enableAdding();
-			player.setOnCompletionListener(mp -> {
-				player.setVolume(1, 1);
-				Toast.makeText(this, "Stop countdown", Toast.LENGTH_SHORT).show();
-			});
+			player.setOnCompletionListener(mp -> mp.setVolume(1, 1));
 			player.setOnErrorListener((mp, what, extra) -> {
 				Toast.makeText(this, "MediaPlayer error", Toast.LENGTH_LONG).show();
 				return false;
@@ -291,12 +294,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 				break;
 			case R.id.action_mute:
 				actionChangeMuteCurrent();
-				break;
+				return true;
 			case R.id.action_clear:
 				actionClearAlarms();
 				break;
 		}
 		Log.i(TAG, "bottom item selected");
 		return false;
+	}
+
+	@Override
+	public void onNavigationItemReselected(@NonNull MenuItem mi) {
+		final boolean inverse = !mi.isCheckable();
+		mi.setCheckable(inverse);
+		mi.setChecked(inverse);
 	}
 }

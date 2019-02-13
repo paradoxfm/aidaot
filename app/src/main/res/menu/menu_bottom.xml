@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/action_add"
+	      android:checkable="false"
 	      android:title="@string/menu_add_lap"
 	      android:icon="@drawable/ic_add_alarm" />
 	<item android:id="@+id/action_mute"
 	      android:title="@string/menu_mute"
+	      android:checkable="false"
 	      android:icon="@drawable/ic_volume_off" />
 	<item android:id="@+id/action_clear"
 	      android:title="@string/menu_clear"
+	      android:checkable="false"
 	      android:icon="@drawable/ic_layers_clear" />
 </menu>
